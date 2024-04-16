@@ -25,13 +25,15 @@ SECRET_KEY = 'django-insecure-=0+pbl=58%g(%-0wa4#mtk#4^u^^wm!+tb-^vj9g_=)kbru80^
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["http://127.0.0.1:8080/",
+                 '127.0.0.1' ]
 
 
 # Application definition
 
 INSTALLED_APPS = [
     "air.apps.AirConfig",
+    'rest_framework',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
