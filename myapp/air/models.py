@@ -17,7 +17,7 @@ class Company(models.Model):
     
     
 class Entity(models.Model):
-    entity_id=models.AutoField(primary_key=True)
+    entity_id=models.AutoField(primary_key=True,unique=True)
     entity_name=models.CharField(max_length=50)
     is_active=models.BooleanField(default=True)
     company = models.ForeignKey(Company, on_delete=models.CASCADE)

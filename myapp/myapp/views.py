@@ -20,13 +20,13 @@ def company_detail(request, company_id):
 
    
 
-def entity_detail(request, entity_id):
-    entity = Company.objects.filter(entity_id=entity_id).first()
+def entity_detail(entity_id):
+    entity = Entity.objects.filter(entity_id=entity_id).first()
     entity_data = {
-        'entity_id': entity.entity_id,
+        'entity_id':entity.entity_id,
         'entity_name': entity.entity_name,
         'is_active': entity.is_active,
-        'company':entity.company
+        'company':entity.company,
     }
     
     return JsonResponse(entity_data)
@@ -72,17 +72,61 @@ from rest_framework.views import APIView
 from .serializers import *
 
 
+class RegisterEntity(APIView):
+    def post(self, request):
+        try:
+            entity_id = request.data['entity_id']
+            entity_name = request.data['entity_name']
+            is_active = request.data['is_active']
+            company = request.data['company']
+            
+            # Check if entity with provided ID already exists
+            if Entity.objects.filter(entity_id=entity_id).exists():
+                return Response({"error": f"Entity with ID {entity_id} already exists"}, status=status.HTTP_400_BAD_REQUEST)
+            company = Company.objects.get(pk=company)
+            # Create new entity
+            new_entity = Entity.objects.create(
+                entity_id=entity_id,
+                entity_name=entity_name,
+                is_active=is_active,
+                company=company
+            )
+            return Response({"message": f"Entity {entity_id} registered successfully"}, status=status.HTTP_201_CREATED)
+        except KeyError as e:
+            return Response({"error": f"Missing required field: {e}"}, status=status.HTTP_400_BAD_REQUEST)
+        
+        
+class DeactivateEntity(APIView):
+    def post(self,request):
+        try:
+            entity_id=request.data['entity_id']
+            entity = Entity.objects.get(entity_id=entity_id)
+            
+            # Deactivate entity by setting is_active to False
+            entity.is_active = False
+            entity.save()
+            
+            return Response({"message": f"Entity {entity_id} deactivated successfully"}, status=status.HTTP_200_OK)
+        except Entity.DoesNotExist:
+            return Response({"error": f"Entity with ID {entity_id} does not exist"}, status=status.HTTP_404_NOT_FOUND)
+        except KeyError as e:
+            return Response({"error": f"Missing required field: {e}"}, status=status.HTTP_400_BAD_REQUEST)
+
 
 class EntityApiView(APIView):
     def get(self,request):
         entities=Entity.objects.all().values()
         entitydata=EntityData.objects.all().values()
         
+        
         return Response({"message":"List of Entities","Entities are":entities,"Entity Data is":entitydata})
     def post(self, request):
         try:
             print("Request Data:", request.data)  # Print request data
+            
             entity_id = request.data.get("entity_id")
+            
+                
             if entity_id is None:
                 return Response({"error": "entity_id is required"}, status=status.HTTP_400_BAD_REQUEST)
             EntityData.objects.create(
@@ -95,6 +139,7 @@ class EntityApiView(APIView):
             return Response({"message": "Entity data created successfully"}, status=status.HTTP_201_CREATED)
         except KeyError as e:
             return Response({"error": f"Missing required field: {e}"}, status=status.HTTP_400_BAD_REQUEST)
+    
 
     
     

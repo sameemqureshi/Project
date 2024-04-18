@@ -31,7 +31,9 @@ urlpatterns = [
     path('companies/<int:company_id>/', views.company_detail, name='company_detail'),
     path('entities/<int:entity_id>/', views.entity_detail, name='entity_detail'),
     # path('push-entity-data/', views.push_entity_data, name='push_entity_data'),
-    re_path('entitydata',views.EntityApiView.as_view()),
+    re_path('entities/entitydata',views.EntityApiView.as_view()),
+    path('entities/register-entity/', views.RegisterEntity.as_view(), name='register_entity'),
+    path('entities/deactivate-entity/',views.DeactivateEntity.as_view(),name='deactivate_entity')
 
 ]
 
